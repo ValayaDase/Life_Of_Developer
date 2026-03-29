@@ -1,37 +1,90 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { useHeroStore } from '../store/heroStore';
+// src/app/page.js
+// ─────────────────────────────────────────────────────────────────
+// This is the ONLY client entry point for the whole narrative.
+// Everything Three.js / browser API is gated behind dynamic() with
+// ssr: false so the server never tries to run WebGL code.
+// ─────────────────────────────────────────────────────────────────
 
-const Hero = dynamic(() => import('../components/sections/Hero'), { 
+import dynamic from 'next/dynamic';
+import { useHeroStore } from '@/store/heroStore';
+import SmoothScrollProvider from '@/components/SmoothScrollProvider';
+import DebuggingDescent from '@/components/sections/DebuggingDescent';
+import BlueprintAssembly from '@/components/sections/BlueprintAssembly';
+// import Preloader from '@/components/layout/Preloader';
+
+/* ── Dynamic imports ─────────────────────────────────────────────── */
+
+const Preloader = dynamic(() => import('@/components/layout/Preloader'), {
   ssr: false,
-  loading: () => <div className="h-screen bg-[#050508]" />
 });
 
+const Overlay = dynamic(() => import('@/components/layout/Overlay'), {
+  ssr: false,
+});
+
+const Hero = dynamic(() => import('@/components/sections/Hero'), {
+  ssr: false,
+  loading: () => <div className="h-[400vh] bg-[#050508]" />,
+});
+
+const Chapter03 = dynamic(() => import('@/components/sections/Chapter03'), {
+  ssr: false,
+  loading: () => <div className="h-screen bg-[#020617]" />,
+});
+
+
+/* ── Page ────────────────────────────────────────────────────────── */
 export default function HomePage() {
   const isLoaded = useHeroStore((s) => s.isLoaded);
 
   return (
-    <main className="relative bg-[#050508]">
-      {/* 400vh 3D Story Section */}
-      <Hero />
+    /*
+      SmoothScrollProvider wraps everything so Lenis controls all
+      scrolling — both Hero's 400vh and Chapter02's 400vh get the
+      same cinematic ease.
+    */
+    <SmoothScrollProvider>
 
-      {/* Section 2: Projects Reveal */}
-      <section
-        id="projects"
-        className="relative min-h-screen flex items-center justify-center z-20"
-        style={{ background: '#020409' }}
-      >
-        <div className="absolute inset-0 opacity-10 pointer-events-none"
-          style={{ backgroundImage: 'linear-gradient(#00f0ff 1px, transparent 1px), linear-gradient(90deg, #00f0ff 1px, transparent 1px)', backgroundSize: '50px 50px' }}
-        />
-        <div className="relative text-center z-10">
-          <h2 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter">
-            Digital <span className="text-cyan-400 text-outline">Projects</span>
-          </h2>
-          <p className="text-white/30 font-mono mt-4">Exploring the architecture of code.</p>
-        </div>
-      </section>
-    </main>
+      {/* ── Global Preloader (Data Stream concept, z-100) ── */}
+      <Preloader />
+
+      {/* ── Persistent Nav / HUD (visible post-load) ── */}
+      <Overlay isLoaded={isLoaded} />
+
+      {/* ── Narrative Sections ── */}
+      <main className="relative">
+
+        {/*
+          ┌─────────────────────────────────┐
+          │  Chapter 01 — The Sanctuary     │
+          │  Hero section: 400vh pinned     │
+          │  Desk scene, laptop opening,    │
+          │  GSAP intro dolly               │
+          └─────────────────────────────────┘
+        */}
+        <Hero />
+
+        {/*
+          ┌─────────────────────────────────┐
+          │  Chapter 02 — The Debugging     │
+          │  Paradox: 400vh pinned          │
+          │  Chaos desk, red alert, glitch  │
+          │  post-processing, jitter cam    │
+          └─────────────────────────────────┘
+        */}
+        <DebuggingDescent />
+        <BlueprintAssembly />
+        <Chapter03 />
+
+        {/*
+          ─────────────────────────────────────────────────────────
+          This is the end of the current narrative.
+          ─────────────────────────────────────────────────────────
+        */}
+
+      </main>
+    </SmoothScrollProvider>
   );
 }

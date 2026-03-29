@@ -2,7 +2,7 @@
 
 import { useRef, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { MeshDistortMaterial, Float, Trail } from '@react-three/drei';
+import { MeshDistortMaterial, Float, Trail, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 /**
@@ -92,12 +92,12 @@ function Laptop({ screenGlow, lidAngle }) {
       // openness 0→1 maps to a 0→1 scalar so the screen only glows once open
       const openness = Math.min(1, Math.abs(lidAngle.current) / 1.15);
       screenRef.current.emissiveIntensity =
-        openness * (1.8 + Math.sin(t * 3) * 0.08);
+        openness * (0.3 + Math.sin(t * 3) * 0.04);
     }
 
     // ── Cyan point-light driven by parent screenGlow ref ──
     if (glowRef.current) {
-      glowRef.current.intensity = screenGlow.current * 3 + 0.5;
+      glowRef.current.intensity = screenGlow.current * 1.5 + 0.2;
     }
   });
 
@@ -130,39 +130,60 @@ function Laptop({ screenGlow, lidAngle }) {
         imperatively via lidRef every frame.
       */}
       <group ref={lidRef} rotation={[0, 0, 0]} position={[0, 0.025, -0.43]}>
-        {/* lid shell */}
-        <mesh castShadow>
-          <boxGeometry args={[1.3, 0.02, 0.88]} />
-          <meshStandardMaterial color="#1c1c2e" roughness={0.2} metalness={0.9} />
-        </mesh>
+        {/*
+          We place all lid contents inside a group that is shifted forward by 0.43 
+          so that it aligns with the base when closed.
+        */}
+        <group position={[0, 0, 0.43]}>
+          {/* lid shell */}
+          <mesh castShadow position={[0, 0.01, 0]}>
+            <boxGeometry args={[1.3, 0.02, 0.88]} />
+            <meshStandardMaterial color="#1c1c2e" roughness={0.2} metalness={0.9} />
+          </mesh>
 
-        {/* screen bezel */}
-        <mesh position={[0, 0.012, 0.02]}>
-          <boxGeometry args={[1.2, 0.012, 0.78]} />
-          <meshStandardMaterial color="#0a0a12" roughness={0.4} />
-        </mesh>
+          {/* screen bezel */}
+          <mesh position={[0, -0.001, 0]}>
+            <boxGeometry args={[1.2, 0.01, 0.78]} />
+            <meshStandardMaterial color="#0a0a12" roughness={0.4} />
+          </mesh>
 
-        {/* SCREEN PORTAL — emissive surface */}
-        <mesh ref={screenRef} position={[0, 0.018, 0.02]}>
-          <boxGeometry args={[1.1, 0.005, 0.68]} />
-          <meshStandardMaterial
-            color="#001a33"
-            emissive="#00e5ff"
-            emissiveIntensity={0}   /* starts dark; ramped up in useFrame */
-            roughness={0.0}
-            metalness={0.1}
+          {/* SCREEN PORTAL — emissive surface */}
+          <mesh ref={screenRef} position={[0, -0.006, 0]}>
+            <boxGeometry args={[1.1, 0.002, 0.68]} />
+            <meshStandardMaterial
+              color="#001a33"
+              emissive="#00e5ff"
+              emissiveIntensity={0}   /* starts dark; ramped up in useFrame */
+              roughness={0.0}
+              metalness={0.1}
+            />
+          </mesh>
+
+          {/* cyan point-light behind screen */}
+          <pointLight
+            ref={glowRef}
+            position={[0, -0.1, 0]}
+            color="#00e5ff"
+            intensity={0}             /* starts off; ramped up in useFrame */
+            distance={3}
+            decay={2}
           />
-        </mesh>
 
-        {/* cyan point-light behind screen */}
-        <pointLight
-          ref={glowRef}
-          position={[0, 0.1, 0.1]}
-          color="#00e5ff"
-          intensity={0}             /* starts off; ramped up in useFrame */
-          distance={3}
-          decay={2}
-        />
+          {/* Hello World code text snippet */}
+          <group position={[0, -0.008, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <Text
+              position={[0, 0, 0]}
+              rotation={[0, 0, 0]} // No extra twirl needed anymore, geometry fixes orientations naturally!
+              fontSize={0.05}
+              color="#00ffcc"
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={1.0}
+            >
+              {`function animate() {\n  requestAnimationFrame(animate);\n  console.log("Hello World");\n}`}
+            </Text>
+          </group>
+        </group>
       </group>
     </group>
   );
@@ -303,13 +324,16 @@ export default function RoomModel({ scrollProgress, isMobile }) {
     camera.position.copy(camPos);
     camera.lookAt(camTarget);
 
-    // ── Lid opening (scroll 0 → 0.25 → angle 0 → -1.15) ────────────
-    const LID_OPEN_END = 0.25;
+    // ── Lid opening (scroll 0.85 → 1.0 → angle 0 → -1.15) ────────────
+    const LID_OPEN_START = 0.85;
     const LID_OPEN_ANGLE = -1.15;
-    const rawT = Math.min(1, t / LID_OPEN_END);
-    const easedT = rawT * rawT * (3 - 2 * rawT); // smooth-step
-    const targetLid = LID_OPEN_ANGLE * easedT;
-    lidAngle.current = THREE.MathUtils.lerp(lidAngle.current, targetLid, 0.06);
+    let targetLid = 0;
+    if (t > LID_OPEN_START) {
+      const rawT = Math.min(1, (t - LID_OPEN_START) / (1 - LID_OPEN_START));
+      const easedT = rawT * rawT * (3 - 2 * rawT); // smooth-step
+      targetLid = LID_OPEN_ANGLE * easedT;
+    }
+    lidAngle.current = THREE.MathUtils.lerp(lidAngle.current, targetLid, 0.1);
 
     // ── Screen glow tied to lid openness ────────────────────────────
     const openness = Math.min(1, Math.abs(lidAngle.current) / 1.15);

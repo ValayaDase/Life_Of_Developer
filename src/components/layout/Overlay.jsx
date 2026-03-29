@@ -4,17 +4,12 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Globe, User, Mail, Code2, Menu, X } from 'lucide-react';
 
-const NAV_ITEMS = [
-  { label: 'Sanctuary', href: '#hero' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Stack',    href: '#stack' },
-  { label: 'Contact',  href: '#contact' },
-];
+
 
 const SOCIAL = [
-  { Icon: Globe,   href: 'https://github.com/',   label: 'GitHub' },
-  { Icon: User, href: 'https://linkedin.com/',  label: 'LinkedIn' },
-  { Icon: Mail,     href: 'mailto:hello@dev.io',    label: 'Email' },
+  { Icon: Globe, href: 'https://github.com/', label: 'GitHub' },
+  { Icon: User, href: 'https://linkedin.com/', label: 'LinkedIn' },
+  { Icon: Mail, href: 'mailto:hello@dev.io', label: 'Email' },
 ];
 
 export default function Overlay({ isLoaded }) {
@@ -66,18 +61,6 @@ export default function Overlay({ isLoaded }) {
             </div>
           </div>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6 pointer-events-auto">
-            {NAV_ITEMS.map(({ label, href }) => (
-              <a
-                key={label}
-                href={href}
-                className="text-white/40 hover:text-cyan-400 transition-colors duration-200 text-xs tracking-widest uppercase font-mono"
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
 
           {/* Social + mobile menu */}
           <div className="pointer-events-auto flex items-center gap-3">

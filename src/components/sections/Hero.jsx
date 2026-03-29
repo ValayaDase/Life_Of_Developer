@@ -15,33 +15,33 @@ const HeroScene = dynamic(() => import('@/components/canvas/HeroScene'), {
 const PHASES = [
   {
     id: '01',
-    tag: 'THE ARCHITECT',
-    sub: 'Watumull Institute of Electronics Engineering & Computer Science',
-    body: 'Computer Engineering · 3rd Year · Mumbai University',
+    tag: 'THE SURFACE',
+    sub: 'Confidence Level: 100% (The Tutorial Era)',
+    body: 'Just watched a 10-minute "Become a Senior Dev" video. I am a God. I can build Facebook in a weekend. My code is poetic. My variable names are perfect. Life is good.',
     range: [0, 0.28],
     align: 'left',
   },
   {
     id: '02',
-    tag: 'THE GRIND',
-    sub: 'Technical Head @ CSI · MERN Stack Architect',
-    body: 'React · Node.js · MongoDB · Express · REST APIs',
+    tag: 'THE TWILIGHT ZONE',
+    sub: 'Reality Check: 47 Chrome Tabs Open',
+    body: 'Entered the MERN stack. Why is CSS like this? Why does "npm install" take 3 years? I spend 4 hours debugging a semicolon and 2 minutes actually writing code. Send help.',
     range: [0.25, 0.53],
     align: 'right',
   },
   {
     id: '03',
-    tag: 'THE PERSISTENCE',
-    sub: 'AI / ML Enthusiast · Bug Slayer',
-    body: 'TensorFlow · Python · Hugging Face · Neural Nets',
+    tag: 'THE MIDNIGHT ABYSS',
+    sub: 'The 3 AM Hallucinations',
+    body: 'Training an AI model to solve my problems, but now the AI is also depressed. I have forgotten what the sun looks like. Stack Overflow is my only family now. If it works, DON’T TOUCH IT.',
     range: [0.50, 0.78],
     align: 'left',
   },
   {
     id: '04',
-    tag: 'THE PORTAL',
-    sub: 'Entering the Digital Realm',
-    body: 'Scroll to continue the journey →',
+    tag: 'THE TRENCHES',
+    sub: 'Final Boss: Deployment',
+    body: 'It worked on my machine. It’s not working on the server. I am now 10% human, 90% caffeine, and 100% bugs. I have reached the bottom. Scroll to witness the final merge conflict. ↓',
     range: [0.75, 1.00],
     align: 'center',
   },
@@ -66,8 +66,8 @@ function PhasePanel({ phase, scrollYProgress }) {
     phase.align === 'right'
       ? 'items-end text-right ml-auto mr-8 md:mr-16'
       : phase.align === 'center'
-      ? 'items-center text-center mx-auto'
-      : 'items-start text-left ml-8 md:ml-16';
+        ? 'items-center text-center mx-auto'
+        : 'items-start text-left ml-8 md:ml-16';
 
   return (
     <motion.div
@@ -113,13 +113,14 @@ function PhasePanel({ phase, scrollYProgress }) {
 }
 
 /* ─── Scroll progress bar ────────────────────────────────────────── */
-function ScrollBar({ scrollYProgress }) {
+function ScrollBar({ scrollYProgress, overlayOpacity }) {
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
   return (
     <motion.div
       className="fixed bottom-0 left-0 h-[2px] w-full origin-left z-50"
       style={{
         scaleX,
+        opacity: overlayOpacity,
         background: 'linear-gradient(90deg, #00f0ff, #7b2fff)',
       }}
     />
@@ -127,7 +128,7 @@ function ScrollBar({ scrollYProgress }) {
 }
 
 /* ─── Corner HUD ─────────────────────────────────────────────────── */
-function CornerHUD({ scrollYProgress }) {
+function CornerHUD({ scrollYProgress, overlayOpacity }) {
   const [pct, setPct] = useState(0);
   useEffect(() => {
     return scrollYProgress.on('change', (v) => setPct(Math.round(v * 100)));
@@ -138,9 +139,9 @@ function CornerHUD({ scrollYProgress }) {
   ) ?? PHASES[0];
 
   return (
-    <div
+    <motion.div
       className="fixed top-6 right-6 z-50 flex flex-col items-end gap-1 select-none pointer-events-none"
-      style={{ fontFamily: "'JetBrains Mono', monospace" }}
+      style={{ fontFamily: "'JetBrains Mono', monospace", opacity: overlayOpacity }}
     >
       <span className="text-[10px] text-cyan-500/70 tracking-widest uppercase">
         Developer-Life
@@ -150,7 +151,7 @@ function CornerHUD({ scrollYProgress }) {
       <span className="text-[9px] text-cyan-400/50 tracking-[0.2em] uppercase">
         {activePhase.id} // {activePhase.tag}
       </span>
-    </div>
+    </motion.div>
   );
 }
 
@@ -210,6 +211,9 @@ export default function Hero() {
     [0, 1]
   );
 
+  /* Global fade-out for textual UI before lid opens */
+  const overlayOpacity = useTransform(scrollYProgress, [0.8, 0.85], [1, 0]);
+
   return (
     <>
       {/* 400vh scroll driver */}
@@ -234,7 +238,7 @@ export default function Hero() {
           />
 
           {/* Phase text panels */}
-          <div className="absolute inset-0 pointer-events-none">
+          <motion.div className="absolute inset-0 pointer-events-none" style={{ opacity: overlayOpacity }}>
             {PHASES.map((phase) => (
               <PhasePanel
                 key={phase.id}
@@ -242,21 +246,16 @@ export default function Hero() {
                 scrollYProgress={scrollYProgress}
               />
             ))}
-          </div>
+          </motion.div>
 
-          {/* Hero headline (Phase 1 only) */}
+          {/* Hero headline */}
           <motion.div
             className="absolute top-[12%] left-1/2 -translate-x-1/2 text-center pointer-events-none w-full px-6"
             style={{
-              opacity: useTransform(scrollYProgress, [0, 0.22], [1, 0]),
+              opacity: useTransform(scrollYProgress, [0.84, 0.88], [1, 0]),
             }}
           >
-            <p
-              className="text-[10px] md:text-xs tracking-[0.5em] text-cyan-400/80 mb-3 uppercase"
-              style={{ fontFamily: "'JetBrains Mono', monospace" }}
-            >
-              [ Portfolio v2.0 ] — Initializing…
-            </p>
+
             <h1
               className="text-4xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight"
               style={{ fontFamily: "'Syne', sans-serif" }}
@@ -286,8 +285,8 @@ export default function Hero() {
       </div>
 
       {/* Fixed UI elements */}
-      <ScrollBar scrollYProgress={scrollYProgress} />
-      <CornerHUD scrollYProgress={scrollYProgress} />
+      <ScrollBar scrollYProgress={scrollYProgress} overlayOpacity={overlayOpacity} />
+      <CornerHUD scrollYProgress={scrollYProgress} overlayOpacity={overlayOpacity} />
     </>
   );
 }

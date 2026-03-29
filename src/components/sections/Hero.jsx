@@ -252,7 +252,8 @@ export default function Hero() {
           <motion.div
             className="absolute top-[12%] left-1/2 -translate-x-1/2 text-center pointer-events-none w-full px-6"
             style={{
-              opacity: useTransform(scrollYProgress, [0.84, 0.88], [1, 0]),
+              opacity: useTransform(scrollYProgress, [0.75, 0.82], [1, 0]),
+              scale: useTransform(scrollYProgress, [0.75, 0.85], [1, 0]),
             }}
           >
 

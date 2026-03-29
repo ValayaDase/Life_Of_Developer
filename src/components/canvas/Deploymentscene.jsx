@@ -666,7 +666,7 @@ function Scene({ scrollProgress }) {
 export default function DeploymentScene({ scrollProgress, isMobile }) {
     return (
         <Canvas
-            dpr={isMobile ? 1 : [1, 1.8]}
+            dpr={isMobile ? 1 : [1, 1.5]}
             gl={{
                 antialias: !isMobile,
                 alpha: false,
@@ -683,8 +683,8 @@ export default function DeploymentScene({ scrollProgress, isMobile }) {
                 <Scene scrollProgress={scrollProgress} />
             </Suspense>
 
-            {/* Post-processing — only Bloom, no crushing effects */}
-            <EffectComposer disableNormalPass>
+            {/* Post-processing — disable multisampling for huge performance gain */}
+            <EffectComposer disableNormalPass multisampling={0}>
                 <Bloom
                     intensity={0.65}
                     luminanceThreshold={0.45}

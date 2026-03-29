@@ -51,21 +51,12 @@ export default function BlueprintAssembly() {
                     { x: mod.startX, y: mod.startY, opacity: 0, scale: 0.5, rotate: 45 },
                     {
                         x: mod.finalX, y: mod.finalY, opacity: 1, scale: 1, rotate: 0,
-                        duration: 1, ease: "back.out(1.4)"
+                        duration: 1, ease: "back.out(1.4)",
+                        force3D: true
                     },
                     "-=0.6"
                 );
-
-                // Snap Glow Flash Effect
-                tl.to(modulesRef.current[i], {
-                    boxShadow: '0 0 40px #00f0ff',
-                    borderColor: '#fff',
-                    duration: 0.1
-                }).to(modulesRef.current[i], {
-                    boxShadow: '0 0 15px rgba(0, 240, 255, 0.4)',
-                    borderColor: 'rgba(0, 240, 255, 0.4)',
-                    duration: 0.2
-                });
+                // Note: Safely removed boxShadow scrub animations as they cause severe paint lag
             });
 
             // Extra breathing room at the end
@@ -108,14 +99,14 @@ export default function BlueprintAssembly() {
                 <div className="relative w-[45%] md:w-1/2 h-full flex flex-col justify-start pt-[200px] md:pt-[260px] px-8 md:pl-12 md:pr-0 z-30">
                     
                     {/* Text Narrative */}
-                    <div ref={narrativeRef} className="max-w-md relative z-40">
+                    <div ref={narrativeRef} className="max-w-md relative z-40 will-change-transform">
                         <p className="text-slate-400 font-mono text-sm md:text-base leading-relaxed border-l-2 border-cyan-500/50 pl-6 bg-cyan-500/5 py-4 rounded-r-lg backdrop-blur-sm">
                             The chaos of debugging ends here. We transition from fixing errors to establishing a robust, scalable infrastructure where every byte has a purpose.
                         </p>
                     </div>
 
                     {/* CHARACTER ANCHOR (Bottom Right of Left Side) */}
-                    <div ref={charAreaRef} className="absolute bottom-0 right-0 md:right-8 w-[70%] md:w-[60%] min-w-[250px] z-50 pointer-events-none flex flex-col items-center">
+                    <div ref={charAreaRef} className="absolute bottom-0 right-0 md:right-6 w-[85%] md:w-[75%] min-w-[300px] z-50 pointer-events-none flex flex-col items-center will-change-transform">
                         <img
                             src="/standing-dev.png"
                             alt="Standing Developer"
@@ -143,7 +134,7 @@ export default function BlueprintAssembly() {
                     {/* Animated Connection Modules */}
                     {MODULES.map((mod, i) => (
                         <div key={mod.id} ref={el => modulesRef.current[i] = el}
-                            className="absolute z-10 w-24 h-24 md:w-28 md:h-28 bg-[#030712]/90 border border-cyan-500/30 rounded-2xl flex flex-col items-center justify-center p-4 backdrop-blur-md shadow-2xl overflow-hidden">
+                            className="absolute z-10 w-24 h-24 md:w-28 md:h-28 bg-[#030712]/95 border border-cyan-500/40 rounded-2xl flex flex-col items-center justify-center p-4 shadow-[0_0_15px_rgba(0,240,255,0.2)] overflow-hidden will-change-transform">
                             <div className="text-cyan-400 mb-2 opacity-80 group-hover:opacity-100">{mod.icon}</div>
                             <span className="font-mono text-cyan-200 text-[9px] font-bold text-center leading-tight">{mod.label}</span>
                             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />

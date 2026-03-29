@@ -154,7 +154,7 @@ function Laptop({ screenGlow, lidAngle }) {
               color="#001a33"
               emissive="#00e5ff"
               emissiveIntensity={0}   /* starts dark; ramped up in useFrame */
-              roughness={0.0}
+              roughness={0.8}
               metalness={0.1}
             />
           </mesh>
@@ -165,8 +165,8 @@ function Laptop({ screenGlow, lidAngle }) {
             position={[0, -0.1, 0]}
             color="#00e5ff"
             intensity={0}             /* starts off; ramped up in useFrame */
-            distance={3}
-            decay={2}
+            distance={0}
+            decay={0}
           />
 
           {/* Hello World code text snippet */}
@@ -180,7 +180,7 @@ function Laptop({ screenGlow, lidAngle }) {
               anchorY="middle"
               maxWidth={1.0}
             >
-              {`function animate() {\n  requestAnimationFrame(animate);\n  console.log("Hello World");\n}`}
+              {`function animate() {\n  requestGreet();\n  console.log("Hello World");\n}`}
             </Text>
           </group>
         </group>

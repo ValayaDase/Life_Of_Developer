@@ -19,7 +19,7 @@ export default function HeroScene({ scrollProgress }) {
 
   return (
     <Canvas
-      dpr={isMobile ? 1 : [1, 2]}
+      dpr={isMobile ? 1 : [1, 1.5]}
       gl={{
         antialias: !isMobile,
         alpha: false,

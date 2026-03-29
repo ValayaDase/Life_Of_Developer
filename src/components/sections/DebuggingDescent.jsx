@@ -111,7 +111,7 @@ export default function DebuggingDescent() {
                         {ERRORS.map((err, i) => (
                             <div
                                 key={i}
-                                className="ambient-error absolute text-red-500/60 font-mono text-[10px] md:text-xs whitespace-nowrap pointer-events-none z-0"
+                                className="ambient-error absolute text-red-500/60 font-mono text-[10px] md:text-xs whitespace-nowrap pointer-events-none z-0 will-change-transform"
                                 style={{ left: err.left, top: err.top }}
                             >
                                 <span className="bg-red-950/40 px-3 py-1.5 rounded border border-red-500/20">
@@ -121,7 +121,7 @@ export default function DebuggingDescent() {
                         ))}
 
                         {/* 3. NEW: Wrap the motion.div in a standard div to receive the GSAP charRef */}
-                        <div ref={charRef} className="relative z-10 w-80 md:w-[28rem] lg:w-[35rem] flex justify-center items-center">
+                        <div ref={charRef} className="relative z-10 w-80 md:w-[28rem] lg:w-[35rem] flex justify-center items-center will-change-transform">
                             <motion.div
                                 className="w-full h-auto"
                                 animate={{ y: [0, -25, 0] }}
@@ -130,7 +130,7 @@ export default function DebuggingDescent() {
                                 <img
                                     src="/image_c51503.png"
                                     alt="Falling Developer"
-                                    className="w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,240,255,0.15)]"
+                                    className="w-full h-auto object-contain"
                                 />
                             </motion.div>
                         </div>
@@ -142,7 +142,7 @@ export default function DebuggingDescent() {
                                 <div
                                     key={card.id}
                                     ref={(el) => { if (el) cardsRef.current[index] = el; }}
-                                    className="absolute inset-0 flex flex-col justify-center p-8 rounded-2xl shadow-2xl origin-top"
+                                    className="absolute inset-0 flex flex-col justify-center p-8 rounded-2xl shadow-2xl origin-top will-change-transform"
                                     style={{
                                         backgroundColor: '#090D1A',
                                         border: '1px solid rgba(0, 240, 255, 0.2)',
